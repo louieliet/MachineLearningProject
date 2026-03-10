@@ -1,0 +1,65 @@
+gcloud dataproc jobs submit hive \
+--cluster mybigdataproject-cluster \
+--region us-west1 \
+--execute "
+DROP TABLE IF EXISTS atp_matches;
+CREATE EXTERNAL TABLE atp_matches (
+tourney_id STRING,
+tourney_name STRING,
+surface STRING,
+draw_size INT,
+tourney_level STRING,
+tourney_date DATE,
+match_num INT,
+winner_id INT,
+winner_seed INT,
+winner_entry STRING,
+winner_name STRING,
+winner_hand STRING,
+winner_ht INT,
+winner_ioc STRING,
+winner_age FLOAT,
+loser_id INT,
+loser_seed INT,
+loser_entry STRING,
+loser_name STRING,
+loser_hand STRING,
+loser_ht INT,
+loser_ioc STRING,
+loser_age FLOAT,
+score STRING,
+best_of INT,
+round STRING,
+minutes INT,
+w_ace INT,
+w_df INT,
+w_svpt INT,
+w_1stIn INT,
+w_1stWon INT,
+w_2ndWon INT,
+w_SvGms INT,
+w_bpSaved INT,
+w_bpFaced INT,
+l_ace INT,
+l_df INT,
+l_svpt INT,
+l_1stIn INT,
+l_1stWon INT,
+l_2ndWon INT,
+l_SvGms INT,
+l_bpSaved INT,
+l_bpFaced INT,
+winner_rank INT,
+winner_rank_points INT,
+loser_rank INT,
+loser_rank_points INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '
+STORED AS TEXTFILE
+,
+'
+LOCATION 'gs://emiyliz-bucket/datasets/atp_matches/'
+TBLPROPERTIES ('skip.header.line.count'
+=
+'1');"

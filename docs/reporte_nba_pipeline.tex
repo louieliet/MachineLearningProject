@@ -1,0 +1,1114 @@
+% ============================================================
+%  Reporte de Proceso — Proyecto NBA Data Lake + Web Insights
+% ============================================================
+\documentclass[12pt, letterpaper]{article}
+
+% ── Codificación y fuente ──────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+
+% ── Márgenes y espaciado ──────────────────────────────────
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=3cm]{geometry}
+\usepackage{setspace}
+\setstretch{1.15}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+
+% ── Colores ───────────────────────────────────────────────
+\usepackage[dvipsnames, table]{xcolor}
+\definecolor{primary}{HTML}{0F172A}
+\definecolor{accent}{HTML}{0EA5E9}
+\definecolor{muted}{HTML}{64748B}
+\definecolor{lightgray}{HTML}{F1F5F9}
+\definecolor{bordercolor}{HTML}{CBD5E1}
+\definecolor{codebg}{HTML}{1E293B}
+\definecolor{codefg}{HTML}{E2E8F0}
+\definecolor{outputbg}{HTML}{0F172A}
+
+% ── Bloques de código ─────────────────────────────────────
+\usepackage{listings}
+\usepackage{upquote}
+
+\lstdefinestyle{codestyle}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\footnotesize\ttfamily\color{codefg},
+  breaklines=true,
+  breakatwhitespace=false,
+  keepspaces=true,
+  showspaces=false,
+  showstringspaces=false,
+  frame=single,
+  rulecolor=\color{bordercolor},
+  framesep=5pt,
+  xleftmargin=5pt,
+  xrightmargin=5pt,
+  tabsize=2,
+  captionpos=b,
+  aboveskip=6pt,
+  belowskip=4pt,
+  extendedchars=true,
+}
+
+\lstdefinestyle{outputstyle}{
+  backgroundcolor=\color{outputbg},
+  basicstyle=\footnotesize\ttfamily\color{white},
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{muted},
+  framesep=5pt,
+  xleftmargin=5pt,
+  xrightmargin=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  captionpos=b,
+  aboveskip=2pt,
+  belowskip=6pt,
+  extendedchars=true,
+}
+
+% Soporte para caracteres acentuados espanoles dentro de lstlisting con pdflatex.
+% inputenc[utf8] no aplica dentro de lstlisting porque cambia los catcodes;
+% 'literate' mapea los grafemas UTF-8 a sus equivalentes LaTeX de forma segura.
+\lstset{
+  literate=
+    {á}{{\'{a}}}1 {é}{{\'{e}}}1 {í}{{\'\i}}1
+    {ó}{{\'{o}}}1 {ú}{{\'{u}}}1 {ü}{{\"u}}1
+    {ñ}{{\~{n}}}1 {Ñ}{{\~{N}}}1
+    {Á}{{\'{A}}}1 {É}{{\'{E}}}1 {Í}{{\'{I}}}1
+    {Ó}{{\'{O}}}1 {Ú}{{\'{U}}}1 {Ü}{{\"U}}1
+    {¿}{{?`}}1  {¡}{{!`}}1,
+}
+
+% ── Secciones personalizadas ──────────────────────────────
+\usepackage{titlesec}
+% \titlerule[1.2pt] anidado dentro de [after-code] rompe el parser de brackets;
+% se encapsula en un macro para que el ] interno no sea visto por \titleformat.
+\newcommand{\sectionrule}{\titlerule[1.2pt]}
+\titleformat{\section}
+  {\large\bfseries\color{primary}}
+  {\thesection.}{0.6em}{}
+  [\vspace{-2pt}\color{accent}\sectionrule\vspace{4pt}]
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{primary}}
+  {\thesubsection.}{0.5em}{}
+\titleformat{\subsubsection}
+  {\normalsize\itshape\color{muted}}
+  {}{0em}{}
+\titlespacing*{\section}{0pt}{18pt}{8pt}
+\titlespacing*{\subsection}{0pt}{12pt}{4pt}
+\titlespacing*{\subsubsection}{0pt}{8pt}{2pt}
+
+% ── Listas ────────────────────────────────────────────────
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=1.4em, topsep=4pt, itemsep=3pt}
+\setlist[enumerate]{leftmargin=1.4em, topsep=4pt, itemsep=3pt}
+
+% ── Tablas ────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\renewcommand{\arraystretch}{1.35}
+
+% ── Cajas informativas ────────────────────────────────────
+\usepackage[most]{tcolorbox}
+\tcbset{
+  infostyle/.style={
+    enhanced, colback=lightgray, colframe=bordercolor,
+    boxrule=0.6pt, arc=4pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    fonttitle=\small\bfseries\color{primary},
+  }
+}
+
+% ── Hyperlinks ────────────────────────────────────────────
+\usepackage[
+  colorlinks=true, linkcolor=accent, urlcolor=accent, citecolor=accent,
+  pdftitle={Reporte NBA Data Lake}, pdfauthor={Louie Liet}
+]{hyperref}
+
+% ── Cabecera y pie de página ──────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{bordercolor}\leaders\hrule height \headrulewidth\hfill}}
+\fancyhead[L]{\small\color{muted}Proyecto NBA Data Lake + Web Insights}
+\fancyhead[R]{\small\color{muted}Marzo 2026}
+\fancyfoot[C]{\small\color{muted}\thepage}
+
+% ============================================================
+\begin{document}
+
+% ── Portada ───────────────────────────────────────────────
+\begin{titlepage}
+  \pagecolor{primary}\color{white}
+  \vspace*{3cm}
+  \begin{center}
+    {\small\color{accent}\textbf{\MakeUppercase{Big Data --- Proyecto Final}}}\\[0.5cm]
+    \rule{10cm}{1.2pt}\\[0.8cm]
+    {\Huge\bfseries NBA Data Lake}\\[0.3cm]
+    {\LARGE\bfseries + Web Insights}\\[0.8cm]
+    \rule{10cm}{0.4pt}\\[1.2cm]
+    {\large Reporte de Proceso con Código y Evidencia}\\[2.5cm]
+    \begin{tabular}{rl}
+      \textbf{Proyecto GCP:}  & \texttt{bigdata2026-485103} \\[4pt]
+      \textbf{Región:}        & \texttt{us-west1} \\[4pt]
+      \textbf{Cluster:}       & \texttt{bigdata2026-cluster} \\[4pt]
+      \textbf{Bucket:}        & \texttt{gs://bigdata2026-proyecto} \\[4pt]
+      \textbf{Fecha:}         & Marzo 2026 \\
+    \end{tabular}
+    \vfill
+    {\small\color{muted}Hadoop · Hive · Dataproc · Spark · BigQuery · Next.js · Vercel}
+  \end{center}
+\end{titlepage}
+\nopagecolor
+
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Arquitectura General del Proyecto}
+
+El proyecto construye un data lake completo sobre GCP, desde CSVs históricos de la NBA hasta una aplicación web en producción con consultas en tiempo real a BigQuery.
+
+\begin{tcolorbox}[infostyle, title={Recursos GCP activos (evidencia \texttt{gcloud} + \texttt{bq ls})}]
+\begin{tabular}{@{}ll@{}}
+  \textbf{Proyecto}         & \texttt{bigdata2026-485103} — BigData2026 (\#691767452154) \\
+  \textbf{Cluster Dataproc} & \texttt{bigdata2026-cluster} — RUNNING, n2-standard-2, imagen 2.1.108-ubuntu20 \\
+  \textbf{Bucket principal} & \texttt{gs://bigdata2026-proyecto} (datasets/, hive/, pipelines/) \\
+  \textbf{BQ nba\_curated}  & 5 objetos: games, player\_statistics, players, players\_enriched, team\_statistics \\
+  \textbf{BQ nba\_enrichment} & players\_scraped\_staging (3,420 filas) \\
+  \textbf{BQ nba\_serving}  & 13 vistas analíticas \\
+\end{tabular}
+\end{tcolorbox}
+
+\begin{enumerate}
+  \item CSVs locales → GCS (ingestión cruda).
+  \item Hive externo sobre GCS → tablas \texttt{nba\_insights}.
+  \item Spark ETL → limpieza y casteo → \texttt{nba\_curated} (Hive Parquet + BigQuery).
+  \item Web scraping → enriquecimiento → \texttt{nba\_enrichment.players\_scraped\_staging} → MERGE → \texttt{nba\_curated.players\_enriched}.
+  \item Vistas analíticas → \texttt{nba\_serving} (13 vistas).
+  \item Next.js App → consulta BigQuery en servidor → dashboard en Vercel.
+\end{enumerate}
+
+% ============================================================
+\section{Fase 0 — Infraestructura Hadoop/Hive en Dataproc}
+
+\subsection{Paso 1: Configuración del entorno GCP}
+
+Se creó el proyecto GCP y se habilitaron las APIs necesarias desde la CLI.
+
+\begin{lstlisting}[style=codestyle, caption={Creación del proyecto y habilitación de APIs}]
+gcloud projects create bigdata2026-485103 --set-as-default
+
+gcloud config set project bigdata2026-485103
+
+gcloud services enable \
+  compute.googleapis.com \
+  dataproc.googleapis.com \
+  sqladmin.googleapis.com
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- proyecto verificado con \texttt{gcloud projects list}}]
+PROJECT_ID            NAME         PROJECT_NUMBER
+bigdata2026-485103    BigData2026  691767452154
+\end{lstlisting}
+
+\subsection{Paso 2: Creación de los buckets de Cloud Storage}
+
+Se crearon dos buckets en \texttt{us-west1}: uno principal para datos y warehouse de Hive, y uno para las initialization actions del cluster.
+
+\begin{lstlisting}[style=codestyle, caption={Creación de buckets en GCS}]
+# Bucket principal: datos, warehouse Hive, scripts, temporales
+gsutil mb -l us-west1 gs://bigdata2026-proyecto
+
+# Bucket para initialization actions
+gsutil mb -l us-west1 gs://bigdata2026-init-actions
+
+# Descargar y subir el proxy de Cloud SQL
+wget https://storage.googleapis.com/hadoop-lib/connectors/cloud-sql-proxy.sh
+gsutil cp cloud-sql-proxy.sh gs://bigdata2026-init-actions/
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- estructura del bucket principal}]
+gs://bigdata2026-proyecto/datasets/
+gs://bigdata2026-proyecto/hive/
+gs://bigdata2026-proyecto/pipelines/
+\end{lstlisting}
+
+\subsection{Paso 3: Creación de la instancia Cloud SQL (Hive Metastore)}
+
+Se creó una instancia MySQL de tier mínimo para actuar como Hive Metastore externo, desacoplando los metadatos del ciclo de vida del cluster.
+
+\begin{lstlisting}[style=codestyle, caption={Creación de la instancia Cloud SQL para Hive Metastore}]
+gcloud sql instances create hive-metastore \
+  --database-version=MYSQL_8_0 \
+  --tier=db-custom-1-3840 \
+  --region=us-west1 \
+  --root-password=hive-root-password \
+  --storage-type=SSD \
+  --storage-size=10GB
+
+# Crear la base de datos del metastore
+gcloud sql databases create hivemetastore \
+  --instance=hive-metastore
+\end{lstlisting}
+
+\subsection{Paso 4: Configuración de permisos IAM}
+
+Se otorgaron los roles necesarios a la service account de Compute Engine para que los nodos del cluster puedan conectarse a Cloud SQL y GCS.
+
+\begin{lstlisting}[style=codestyle, caption={Asignación de roles IAM a la service account de Compute Engine}]
+# Obtener el email de la service account de Compute Engine
+SA_EMAIL=$(gcloud projects get-iam-policy bigdata2026-485103 \
+  --flatten="bindings[].members" \
+  --filter="bindings.role:roles/compute.serviceAgent" \
+  --format="value(bindings.members)" | head -1)
+
+# Roles requeridos para Dataproc + Cloud SQL
+gcloud projects add-iam-policy-binding bigdata2026-485103 \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/cloudsql.admin"
+
+gcloud projects add-iam-policy-binding bigdata2026-485103 \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/cloudsql.instanceUser"
+
+gcloud projects add-iam-policy-binding bigdata2026-485103 \
+  --member="serviceAccount:${SA_EMAIL}" \
+  --role="roles/dataproc.worker"
+\end{lstlisting}
+
+\subsection{Paso 5: Creación del cluster Dataproc}
+
+Se creó el cluster configurando el Cloud SQL proxy como initialization action y apuntando el warehouse de Hive al bucket de GCS.
+
+\begin{lstlisting}[style=codestyle, caption={Creación del cluster Dataproc con Hive sobre Cloud SQL y GCS}]
+gcloud dataproc clusters create bigdata2026-cluster \
+  --project=bigdata2026-485103 \
+  --region=us-west1 \
+  --zone=us-west1-a \
+  --image-version=2.1-ubuntu20 \
+  --master-machine-type=n2-standard-2 \
+  --master-boot-disk-size=50GB \
+  --num-workers=2 \
+  --worker-machine-type=n2-standard-2 \
+  --worker-boot-disk-size=50GB \
+  --initialization-actions=gs://bigdata2026-init-actions/cloud-sql-proxy.sh \
+  --metadata="hive-metastore-instance=bigdata2026-485103:us-west1:hive-metastore" \
+  --metadata="enable-cloud-sql-proxy-on-workers=false" \
+  --properties="hive:hive.metastore.warehouse.dir=gs://bigdata2026-proyecto/hive/warehouse/" \
+  --enable-component-gateway \
+  --expiration-time="$(date -d '+8 hours' --utc +%Y-%m-%dT%H:%M:%SZ)"
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- cluster RUNNING, imagen 2.1 Ubuntu 20, n2-standard-2}]
+NAME                 STATUS   MACHINE_TYPE_URI         PRIMARY_WORKER_COUNT  IMAGE_VERSION
+bigdata2026-cluster  RUNNING  n2-standard-2            2                     2.1.108-ubuntu20
+\end{lstlisting}
+
+\subsection{Paso 6: Carga de los CSVs a GCS}
+
+Se subieron los 13 archivos CSV organizados en subcarpetas por tabla, requisito de Hive para tablas externas.
+
+\begin{lstlisting}[style=codestyle, caption={Carga de los 13 archivos CSV al bucket de GCS}]
+cd /Users/louieliet/Downloads/archive/
+
+gsutil cp Players.csv             gs://bigdata2026-proyecto/datasets/nba/Players/
+gsutil cp Games.csv               gs://bigdata2026-proyecto/datasets/nba/Games/
+gsutil cp PlayerStatistics.csv    gs://bigdata2026-proyecto/datasets/nba/PlayerStatistics/
+gsutil cp TeamStatistics.csv      gs://bigdata2026-proyecto/datasets/nba/TeamStatistics/
+gsutil cp PlayerStatisticsAdvanced.csv  gs://bigdata2026-proyecto/datasets/nba/PlayerStatisticsAdvanced/
+gsutil cp PlayerStatisticsMisc.csv      gs://bigdata2026-proyecto/datasets/nba/PlayerStatisticsMisc/
+gsutil cp PlayerStatisticsScoring.csv   gs://bigdata2026-proyecto/datasets/nba/PlayerStatisticsScoring/
+gsutil cp PlayerStatisticsUsage.csv     gs://bigdata2026-proyecto/datasets/nba/PlayerStatisticsUsage/
+gsutil cp TeamStatisticsAdvanced.csv    gs://bigdata2026-proyecto/datasets/nba/TeamStatisticsAdvanced/
+gsutil cp TeamStatisticsFourFactors.csv gs://bigdata2026-proyecto/datasets/nba/TeamStatisticsFourFactors/
+gsutil cp TeamStatisticsMisc.csv        gs://bigdata2026-proyecto/datasets/nba/TeamStatisticsMisc/
+gsutil cp TeamStatisticsScoring.csv     gs://bigdata2026-proyecto/datasets/nba/TeamStatisticsScoring/
+gsutil cp TeamHistories.csv             gs://bigdata2026-proyecto/datasets/nba/TeamHistories/
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- 13 carpetas confirmadas via \texttt{gsutil ls}}]
+gs://bigdata2026-proyecto/datasets/nba/Games/
+gs://bigdata2026-proyecto/datasets/nba/PlayerStatistics/
+gs://bigdata2026-proyecto/datasets/nba/PlayerStatisticsAdvanced/
+gs://bigdata2026-proyecto/datasets/nba/PlayerStatisticsMisc/
+gs://bigdata2026-proyecto/datasets/nba/PlayerStatisticsScoring/
+gs://bigdata2026-proyecto/datasets/nba/PlayerStatisticsUsage/
+gs://bigdata2026-proyecto/datasets/nba/Players/
+gs://bigdata2026-proyecto/datasets/nba/TeamHistories/
+gs://bigdata2026-proyecto/datasets/nba/TeamStatistics/
+gs://bigdata2026-proyecto/datasets/nba/TeamStatisticsAdvanced/
+gs://bigdata2026-proyecto/datasets/nba/TeamStatisticsFourFactors/
+gs://bigdata2026-proyecto/datasets/nba/TeamStatisticsMisc/
+gs://bigdata2026-proyecto/datasets/nba/TeamStatisticsScoring/
+\end{lstlisting}
+
+\subsection{Paso 7: Creación de las tablas Hive externas}
+
+Se creó la base de datos con \texttt{LOCATION} explícita y las 13 tablas externas via job Hive en Dataproc, usando \texttt{OpenCSVSerde} para parsear los archivos CSV con encabezado.
+
+\begin{lstlisting}[style=codestyle, caption={Creación de la base de datos \texttt{nba\_insights} con location explícita}]
+gcloud dataproc jobs submit hive \
+  --cluster=bigdata2026-cluster \
+  --region=us-west1 \
+  --execute "
+    CREATE DATABASE IF NOT EXISTS nba_insights
+    LOCATION 'gs://bigdata2026-proyecto/hive/warehouse/nba_insights.db';
+  "
+\end{lstlisting}
+
+\begin{lstlisting}[style=codestyle, caption={Creación de la tabla externa \texttt{players} (patrón replicado para las 13 tablas)}]
+gcloud dataproc jobs submit hive \
+  --cluster=bigdata2026-cluster \
+  --region=us-west1 \
+  --execute "
+    CREATE EXTERNAL TABLE IF NOT EXISTS nba_insights.players (
+      personid        STRING,
+      firstname       STRING,
+      lastname        STRING,
+      birthdate       STRING,
+      school          STRING,
+      country         STRING,
+      heightinches    STRING,
+      bodyweightlbs   STRING,
+      position        STRING,
+      guard           STRING,
+      forward         STRING,
+      center          STRING,
+      draftyear       STRING,
+      draftround      STRING,
+      draftnumber     STRING
+    )
+    ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+    WITH SERDEPROPERTIES (
+      'separatorChar' = ',',
+      'quoteChar'     = '\"'
+    )
+    STORED AS TEXTFILE
+    LOCATION 'gs://bigdata2026-proyecto/datasets/nba/Players/'
+    TBLPROPERTIES ('skip.header.line.count' = '1');
+  "
+\end{lstlisting}
+
+\subsection{Paso 8: Análisis exploratorio (EDA) vía PySpark/Hive}
+
+Se abrió una sesión SSH al nodo master y se ejecutaron 6 queries analíticas usando \texttt{HiveContext} de PySpark.
+
+\begin{lstlisting}[style=codestyle, caption={Conexión SSH al master y apertura de sesión PySpark}]
+gcloud compute ssh bigdata2026-cluster-m --zone=us-west1-a
+
+# Dentro del nodo master:
+pyspark
+\end{lstlisting}
+
+\begin{lstlisting}[style=codestyle, caption={Q1 --- Jugadores con altura mayor a 2.20 m}]
+from pyspark.sql import HiveContext
+hc = HiveContext(sc)
+
+hc.sql("""
+  SELECT personid, firstname, lastname,
+    CAST(heightinches AS DOUBLE) AS altura_pulgadas,
+    ROUND(CAST(heightinches AS DOUBLE) * 0.0254, 3) AS altura_metros
+  FROM nba_insights.players
+  WHERE CAST(heightinches AS DOUBLE) * 0.0254 > 2.20
+  ORDER BY altura_metros DESC, lastname, firstname
+""").show(2147483647)
+\end{lstlisting}
+
+\begin{lstlisting}[style=codestyle, caption={Q2 --- Búsqueda de Victor Wembanyama}]
+hc.sql("""
+  SELECT * FROM nba_insights.players
+  WHERE LOWER(CONCAT(firstname, ' ', lastname)) LIKE '%wembanyama%'
+""").show()
+\end{lstlisting}
+
+\begin{lstlisting}[style=codestyle, caption={Q3 --- Jugadores con al menos un campo nulo}]
+hc.sql("""
+  SELECT * FROM nba_insights.players
+  WHERE birthdate IS NULL OR school IS NULL OR country IS NULL
+     OR heightinches IS NULL OR bodyweightlbs IS NULL
+     OR draftyear IS NULL OR draftround IS NULL OR draftnumber IS NULL
+""").show(2147483647)
+\end{lstlisting}
+
+\begin{lstlisting}[style=codestyle, caption={Q4 --- Conteo de nulos por atributo}]
+hc.sql("""
+  SELECT
+    SUM(CASE WHEN birthdate IS NULL THEN 1 ELSE 0 END)    AS null_birthdate,
+    SUM(CASE WHEN school IS NULL THEN 1 ELSE 0 END)       AS null_school,
+    SUM(CASE WHEN country IS NULL THEN 1 ELSE 0 END)      AS null_country,
+    SUM(CASE WHEN heightinches IS NULL THEN 1 ELSE 0 END) AS null_height,
+    SUM(CASE WHEN bodyweightlbs IS NULL THEN 1 ELSE 0 END) AS null_weight,
+    SUM(CASE WHEN draftyear IS NULL THEN 1 ELSE 0 END)    AS null_draftyear,
+    SUM(CASE WHEN draftround IS NULL THEN 1 ELSE 0 END)   AS null_draftround,
+    SUM(CASE WHEN draftnumber IS NULL THEN 1 ELSE 0 END)  AS null_draftnumber
+  FROM nba_insights.players
+""").show()
+\end{lstlisting}
+
+\begin{lstlisting}[style=codestyle, caption={Q5 --- Nulos por década de draft}]
+hc.sql("""
+  SELECT
+    CONCAT(CAST(FLOOR(CAST(draftyear AS INT)/10)*10 AS STRING), 's') AS decada,
+    COUNT(*) AS total,
+    SUM(CASE WHEN birthdate IS NULL THEN 1 ELSE 0 END) AS null_birthdate,
+    SUM(CASE WHEN school IS NULL THEN 1 ELSE 0 END)    AS null_school,
+    SUM(CASE WHEN country IS NULL THEN 1 ELSE 0 END)   AS null_country
+  FROM nba_insights.players
+  WHERE draftyear IS NOT NULL
+  GROUP BY FLOOR(CAST(draftyear AS INT)/10)*10
+  ORDER BY decada
+""").show()
+\end{lstlisting}
+
+\begin{lstlisting}[style=codestyle, caption={Q6 --- Jugadores activos 2025-26 con nulos y al menos 1 punto (query motivadora del enriquecimiento)}]
+hc.sql("""
+  SELECT p.personid, p.firstname, p.lastname,
+    SUM(ps.points) AS total_puntos,
+    SUM(CASE WHEN p.birthdate IS NULL THEN 1 ELSE 0 END)  AS null_birthdate,
+    SUM(CASE WHEN p.draftyear IS NULL THEN 1 ELSE 0 END)  AS null_draftyear
+  FROM nba_insights.players p
+  JOIN nba_insights.player_statistics ps ON p.personid = ps.personid
+  WHERE ps.season = '2025-2026'
+  GROUP BY p.personid, p.firstname, p.lastname
+  HAVING SUM(ps.points) > 1
+    AND (MAX(CASE WHEN p.birthdate IS NULL THEN 1 ELSE 0 END) = 1
+      OR MAX(CASE WHEN p.draftyear IS NULL THEN 1 ELSE 0 END) = 1)
+  ORDER BY total_puntos ASC
+""").show(2147483647)
+-- Resultado: 646 jugadores activos con datos incompletos
+\end{lstlisting}
+
+\subsection{Paso 9: Verificación del Hive Metastore}
+
+Se hizo una conexión directa a la instancia Cloud SQL para confirmar que el metastore registraba correctamente las ubicaciones físicas en GCS.
+
+\begin{lstlisting}[style=codestyle, caption={Conexión a Cloud SQL y verificación del metastore}]
+gcloud sql connect hive-metastore --user=root
+
+-- Dentro de MySQL:
+USE hivemetastore;
+
+-- Verificar tablas registradas con sus ubicaciones en GCS
+SELECT t.TBL_NAME, s.LOCATION, s.INPUT_FORMAT
+FROM TBLS t
+JOIN DBS d   ON t.DB_ID  = d.DB_ID
+JOIN SDS s   ON t.SD_ID  = s.SD_ID
+WHERE d.NAME = 'nba_insights'
+ORDER BY t.TBL_NAME;
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- metastore registra las 13 tablas apuntando a GCS}]
++--------------------------+-------------------------------------------------------+
+| TBL_NAME                 | LOCATION                                              |
++--------------------------+-------------------------------------------------------+
+| games                    | gs://bigdata2026-proyecto/datasets/nba/Games          |
+| player_statistics        | gs://bigdata2026-proyecto/datasets/nba/PlayerStats... |
+| player_statistics_adv    | gs://bigdata2026-proyecto/datasets/nba/PlayerStats... |
+| player_statistics_misc   | gs://bigdata2026-proyecto/datasets/nba/PlayerStats... |
+| player_statistics_scori  | gs://bigdata2026-proyecto/datasets/nba/PlayerStats... |
+| player_statistics_usage  | gs://bigdata2026-proyecto/datasets/nba/PlayerStats... |
+| players                  | gs://bigdata2026-proyecto/datasets/nba/Players        |
+| team_histories           | gs://bigdata2026-proyecto/datasets/nba/TeamHistories  |
+| team_statistics          | gs://bigdata2026-proyecto/datasets/nba/TeamStatistics |
+| team_statistics_adv      | gs://bigdata2026-proyecto/datasets/nba/TeamStats...   |
+| team_statistics_factors  | gs://bigdata2026-proyecto/datasets/nba/TeamStats...   |
+| team_statistics_misc     | gs://bigdata2026-proyecto/datasets/nba/TeamStats...   |
+| team_statistics_scoring  | gs://bigdata2026-proyecto/datasets/nba/TeamStats...   |
++--------------------------+-------------------------------------------------------+
+13 rows in set
+\end{lstlisting}
+
+% ============================================================
+\section{Fase 1 — Modernización y limpieza: Spark \textrightarrow{} BigQuery}
+\textit{Script: \texttt{step1\_modernize\_clean\_spark.py}}
+
+\subsection{Ejecución del job en Dataproc}
+
+\begin{lstlisting}[style=codestyle, caption={Subida del script y ejecución del job PySpark en Dataproc}]
+# Subir el script al bucket
+gsutil cp step1_modernize_clean_spark.py gs://bigdata2026-proyecto/pipelines/
+
+# Ejecutar el job con el conector de BigQuery
+gcloud dataproc jobs submit pyspark \
+  gs://bigdata2026-proyecto/pipelines/step1_modernize_clean_spark.py \
+  --cluster=bigdata2026-cluster \
+  --region=us-west1 \
+  --jars=gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar \
+  -- \
+  --source-db nba_insights \
+  --target-db nba_curated \
+  --target-db-location gs://bigdata2026-proyecto/hive/warehouse/nba_curated.db \
+  --write-bigquery \
+  --bq-project bigdata2026-485103 \
+  --bq-dataset nba_curated \
+  --temporary-gcs-bucket gs://bigdata2026-proyecto/tmp
+\end{lstlisting}
+
+\subsection{Componentes clave del script}
+
+\textbf{Normalización de nulos en columnas string:}
+
+\begin{lstlisting}[style=codestyle, caption={Función \texttt{normalize\_string\_nulls} --- convierte variantes de null a NULL real}]
+NULL_LIKE_VALUES = ["", "null", "none", "nan", "na", "n/a", "undefined"]
+
+def normalize_string_nulls(df: DataFrame) -> DataFrame:
+    result = df
+    for field in result.schema.fields:
+        if isinstance(field.dataType, StringType):
+            col = F.trim(F.col(field.name))
+            result = result.withColumn(
+                field.name,
+                F.when(
+                    F.lower(col).isin(*NULL_LIKE_VALUES) | col.eqNullSafe(""),
+                    F.lit(None),
+                ).otherwise(col),
+            )
+    return result
+\end{lstlisting}
+
+\textbf{Derivación de la temporada NBA a partir de la fecha del partido:}
+
+\begin{lstlisting}[style=codestyle, caption={Función \texttt{add\_nba\_season} --- temporada derivada de \texttt{gamedatetimeest}}]
+def add_nba_season(df: DataFrame, datetime_col: str = "gamedatetimeest") -> DataFrame:
+    game_date  = F.to_date(F.col(datetime_col))
+    start_year = F.when(F.month(game_date) >= 10, F.year(game_date)).otherwise(
+        F.year(game_date) - 1
+    )
+    end_year = start_year + F.lit(1)
+    season   = F.concat_ws("-", start_year.cast("string"), end_year.cast("string"))
+
+    return (
+        df.withColumn("game_date", game_date)
+          .withColumn("season_start_year", start_year.cast("int"))
+          .withColumn("season", season)
+    )
+\end{lstlisting}
+
+\textbf{Aplicación sobre la tabla \texttt{players} con features derivadas:}
+
+\begin{lstlisting}[style=codestyle, caption={Transformaciones sobre la tabla \texttt{players}: tipos, conversiones métricas y timestamp}]
+players = spark.table(f"{args.source_db}.players")
+players = normalize_string_nulls(players)
+players = cast_columns(players, players_casts)
+players = (
+    players
+    .withColumn("height_m",
+        F.round(F.col("heightinches") * F.lit(0.0254), 3))
+    .withColumn("weight_kg",
+        F.round(F.col("bodyweightlbs") * F.lit(0.45359237), 2))
+    .withColumn("updated_at", F.current_timestamp())
+)
+\end{lstlisting}
+
+\textbf{Escritura a Hive (Parquet) y BigQuery con DB location explícita:}
+
+\begin{lstlisting}[style=codestyle, caption={Creación de DB Hive curada con LOCATION explícita y escritura Parquet + BigQuery}]
+# Crear la DB con location GCS explícita para evitar warehouse por defecto inexistente
+if args.target_db_location:
+    spark.sql(
+        f"CREATE DATABASE IF NOT EXISTS {args.target_db} "
+        f"LOCATION '{args.target_db_location}'"
+    )
+
+# Escribir a Hive como Parquet (particionado por season)
+df.write.mode("overwrite").format("parquet") \
+        .partitionBy("season").saveAsTable(f"{target_db}.{table}")
+
+# Escribir a BigQuery usando el conector oficial
+df.write.format("bigquery") \
+        .option("table", f"{project}.{dataset}.{table}") \
+        .option("temporaryGcsBucket", gcs_temp) \
+        .mode("overwrite").save()
+\end{lstlisting}
+
+\subsection{Resultados en BigQuery}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- conteo real de filas en \texttt{nba\_curated} (BigQuery)}]
++-------------------+---------+
+|       tabla       |  filas  |
++-------------------+---------+
+| player_statistics | 1658636 |
+| team_statistics   |  145709 |
+| games             |   72854 |
+| players           |    6683 |
++-------------------+---------+
+\end{lstlisting}
+
+% ============================================================
+\section{Fase 2 — Enriquecimiento por web scraping}
+\textit{Script: \texttt{step2\_scrape\_enrich\_players.py}}
+
+\subsection{Ejecución del script}
+
+\begin{lstlisting}[style=codestyle, caption={Ejecución del scraper con \texttt{--skip-stats-api} (tercera iteración, exitosa)}]
+pip install -r requirements_step2.txt
+
+python step2_scrape_enrich_players.py \
+  --project-id bigdata2026-485103 \
+  --curated-dataset nba_curated \
+  --enrichment-dataset nba_enrichment \
+  --season 2025-2026 \
+  --batch-size 100 \
+  --skip-stats-api \
+  --credentials-file bigdata2026-485103-aead21c1d814.json
+\end{lstlisting}
+
+\subsection{Lógica de priorización de jugadores}
+
+Los jugadores se seleccionan ordenados por impacto (suma de puntos en la temporada) para enriquecer primero los más relevantes.
+
+\begin{lstlisting}[style=codestyle, caption={Query BigQuery para obtener jugadores con nulos ordenados por impacto}]
+WITH target AS (
+  SELECT p.personid, p.firstname, p.lastname
+  FROM `{project}.{curated_dataset}.players` p
+  WHERE birthdate IS NULL OR school IS NULL OR country IS NULL
+     OR heightinches IS NULL OR bodyweightlbs IS NULL
+     OR draftyear IS NULL OR draftround IS NULL OR draftnumber IS NULL
+),
+scored AS (
+  SELECT personid, SUM(CAST(points AS FLOAT64)) AS total_points
+  FROM `{project}.{curated_dataset}.player_statistics`
+  WHERE season = @season
+  GROUP BY personid
+)
+SELECT t.personid, t.firstname, t.lastname,
+       COALESCE(s.total_points, 0) AS total_points
+FROM target t
+LEFT JOIN scored s ON t.personid = s.personid
+ORDER BY total_points DESC
+LIMIT @batch_size
+\end{lstlisting}
+
+\subsection{Scraping de perfiles NBA (\texttt{\_\_NEXT\_DATA\_\_})}
+
+\begin{lstlisting}[style=codestyle, caption={Extracción de datos del JSON embebido en la página de perfil del jugador}]
+def get_player_info_from_nba_profile_page(person_id, timeout):
+    url = f"https://www.nba.com/player/{person_id}"
+    response = requests.get(url, headers=NBA_STATS_HEADERS, timeout=timeout)
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    next_data_tag = soup.find("script", {"id": "__NEXT_DATA__"})
+    data = json.loads(next_data_tag.text)
+
+    # Ruta principal en el JSON de Next.js
+    info_node = (
+        data.get("props", {})
+            .get("pageProps", {})
+            .get("player", {})
+            .get("info", {})
+    )
+
+    # Extraccion con normalize_key para cubrir variantes (DRAFT_YEAR/draftYear/draft_year)
+    draft_year_raw = info_node.get("DRAFT_YEAR") or find_first_non_empty(
+        data, ["draftYear", "draftyear", "draft_year", "DRAFT_YEAR"]
+    )
+    return {
+        "birthdate": info_node.get("BIRTHDATE"),
+        "country":   info_node.get("COUNTRY"),
+        "draftyear": draft.get("draftyear"),
+        "source_type": "nba_profile_page",
+    }
+\end{lstlisting}
+
+\subsection{MERGE hacia la tabla curada}
+
+\begin{lstlisting}[style=codestyle, caption={Operación MERGE --- aplica valores scrapeados sin sobreescribir datos existentes}]
+MERGE `{project}.{curated_dataset}.players_enriched` T
+USING (
+  SELECT s.personid,
+    ANY_VALUE(s.birthdate)    AS birthdate,
+    ANY_VALUE(s.country)      AS country,
+    ANY_VALUE(s.heightinches) AS heightinches,
+    ANY_VALUE(s.draftyear)    AS draftyear,
+    ANY_VALUE(s.draftround)   AS draftround,
+    ANY_VALUE(s.draftnumber)  AS draftnumber,
+    ANY_VALUE(s.source_type)  AS source_type
+  FROM `{project}.{enrichment_dataset}.players_scraped_staging` s
+  WHERE s.pipeline_run_id = @pipeline_run_id
+  GROUP BY s.personid
+) S ON T.personid = S.personid
+WHEN MATCHED THEN UPDATE SET
+  T.birthdate  = COALESCE(T.birthdate, S.birthdate),
+  T.country    = COALESCE(T.country, S.country),
+  T.heightinches = COALESCE(T.heightinches, S.heightinches),
+  T.draftyear  = COALESCE(T.draftyear, SAFE_CAST(S.draftyear AS INT64)),
+  T.draftround = COALESCE(T.draftround, SAFE_CAST(S.draftround AS INT64)),
+  T.draftnumber = COALESCE(T.draftnumber, SAFE_CAST(S.draftnumber AS INT64)),
+  T.enriched_at = CURRENT_TIMESTAMP(),
+  T.enrichment_run_id = @pipeline_run_id
+WHEN NOT MATCHED THEN
+  INSERT (personid, birthdate, country, heightinches, bodyweightlbs,
+          draftyear, draftround, draftnumber, enriched_at, enrichment_run_id)
+  VALUES (S.personid, S.birthdate, S.country, S.heightinches, S.bodyweightlbs,
+          SAFE_CAST(S.draftyear AS INT64), SAFE_CAST(S.draftround AS INT64),
+          SAFE_CAST(S.draftnumber AS INT64), CURRENT_TIMESTAMP(), @pipeline_run_id)
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- log real de la ejecucion exitosa con \texttt{--skip-stats-api}}]
+[start] pipeline_run_id=run_20260302_024231 total_players=100
+[ok] player=1630178 source=nba_profile_page  fields=7  elapsed_s=0.45
+[ok] player=1628983 source=nba_profile_page  fields=7  elapsed_s=0.44
+[progress] 2/100 success=2 fail=0 elapsed_s=1.5
+[ok] player=1628378 source=nba_profile_page  fields=7  elapsed_s=1.12
+[ok] player=1627759 source=nba_profile_page  fields=7  elapsed_s=0.31
+[ok] player=1629029 source=nba_profile_page  fields=7  elapsed_s=0.75
+[ok] player=1630162 source=nba_profile_page  fields=7  elapsed_s=1.36
+[progress] 6/100 success=6 fail=0 elapsed_s=7.5
+[ok] player=201142  source=nba_profile_page  fields=7  elapsed_s=0.89
+[ok] player=1630595 source=nba_profile_page  fields=7  elapsed_s=0.66
+[progress] 8/100 success=8 fail=0 elapsed_s=10.2
+...
+[merge] starting merge into curated table
+[merge] completed
+[summary] success=100 fail=0 success_by_source={'nba_profile_page': 100}
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- staging table con 3,420 filas y ultimos 10 jugadores enriquecidos}]
+Total filas en players_scraped_staging: 3420
+
++----------+-----------+------------+------------------+---------------------+
+| personid | firstname |  lastname  |   source_type    |     scraped_at      |
++----------+-----------+------------+------------------+---------------------+
+|  1630577 | Julian    | Champagnie | nba_profile_page | 2026-03-10 12:02:08 |
+|  1642273 | Kyshawn   | George     | nba_profile_page | 2026-03-10 12:02:07 |
+|  1631108 | Max       | Christie   | nba_profile_page | 2026-03-10 12:02:06 |
+|  1642276 | Kel'el    | Ware       | nba_profile_page | 2026-03-10 12:02:05 |
+|  1629012 | Collin    | Sexton     | nba_profile_page | 2026-03-10 12:02:04 |
+|  1630581 | Josh      | Giddey     | nba_profile_page | 2026-03-10 12:02:03 |
+|  1626171 | Bobby     | Portis     | nba_profile_page | 2026-03-10 12:02:02 |
+|  1628386 | Jarrett   | Allen      | nba_profile_page | 2026-03-10 12:02:01 |
+|  1628381 | John      | Collins    | nba_profile_page | 2026-03-10 12:02:00 |
+|  1631212 | Peyton    | Watson     | nba_profile_page | 2026-03-10 12:01:58 |
++----------+-----------+------------+------------------+---------------------+
+\end{lstlisting}
+
+% ============================================================
+\section{Fase 3 — Capa Serving en BigQuery}
+\textit{Archivos: \texttt{phase3\_serving\_views.sql} + \texttt{phase3\_deploy\_serving.sh}}
+
+\subsection{Deploy con el script de shell}
+
+\begin{lstlisting}[style=codestyle, caption={Script de despliegue \texttt{phase3\_deploy\_serving.sh}}]
+#!/usr/bin/env bash
+set -euo pipefail
+PROJECT_ID="bigdata2026-485103"
+
+echo "==> Deploying Phase 3 serving views in BigQuery"
+bq query --project_id="${PROJECT_ID}" --use_legacy_sql=false < phase3_serving_views.sql
+
+echo "==> Verifying created views"
+bq ls --project_id="${PROJECT_ID}" "${PROJECT_ID}:nba_serving"
+
+echo "==> Smoke test: player_profile"
+bq query --project_id="${PROJECT_ID}" --use_legacy_sql=false \
+  'SELECT * FROM `bigdata2026-485103.nba_serving.player_profile` LIMIT 5'
+
+echo "Phase 3 deployed successfully."
+\end{lstlisting}
+
+\subsection{Vista \texttt{player\_profile} — lógica de fallback con COALESCE}
+
+\begin{lstlisting}[style=codestyle, caption={Vista \texttt{player\_profile} --- enriquecimiento por COALESCE sobre el join con \texttt{players\_enriched}}]
+CREATE OR REPLACE VIEW `bigdata2026-485103.nba_serving.player_profile` AS
+WITH latest_enriched AS (
+  SELECT *,
+    ROW_NUMBER() OVER (PARTITION BY personid ORDER BY enriched_at DESC) AS rn
+  FROM `bigdata2026-485103.nba_curated.players_enriched`
+)
+SELECT
+  p.personid,
+  COALESCE(e.firstname,   p.firstname)   AS firstname,
+  COALESCE(e.lastname,    p.lastname)    AS lastname,
+  COALESCE(e.birthdate,   p.birthdate)   AS birthdate,
+  COALESCE(e.school,      p.school)      AS school,
+  COALESCE(e.country,     p.country)     AS country,
+  COALESCE(e.heightinches, p.heightinches) AS heightinches,
+  COALESCE(e.bodyweightlbs, p.bodyweightlbs) AS bodyweightlbs,
+  COALESCE(e.draftyear,   p.draftyear)   AS draftyear,
+  COALESCE(e.draftround,  p.draftround)  AS draftround,
+  COALESCE(e.draftnumber, p.draftnumber) AS draftnumber,
+  e.enriched_at,
+  e.enrichment_source
+FROM `bigdata2026-485103.nba_curated.players` p
+LEFT JOIN latest_enriched e
+  ON p.personid = e.personid AND e.rn = 1;
+\end{lstlisting}
+
+\subsection{Vista \texttt{player\_recent\_form} — rolling stats últimos 10 partidos}
+
+\begin{lstlisting}[style=codestyle, caption={Vista \texttt{player\_recent\_form} --- promedios rolling sobre los 10 partidos más recientes}]
+CREATE OR REPLACE VIEW `bigdata2026-485103.nba_serving.player_recent_form` AS
+WITH base AS (
+  SELECT personid, firstname, lastname, gameid, game_date, season,
+    points, assists, reboundstotal, turnovers,
+    fieldgoalspercentage, threepointerspercentage, freethrowspercentage,
+    ROW_NUMBER() OVER (PARTITION BY personid
+                       ORDER BY game_date DESC, gameid DESC) AS rn
+  FROM `bigdata2026-485103.nba_curated.player_statistics`
+),
+last10 AS (SELECT * FROM base WHERE rn <= 10)
+SELECT
+  personid,
+  ANY_VALUE(firstname)   AS firstname,
+  ANY_VALUE(lastname)    AS lastname,
+  COUNT(*)               AS games_sample,
+  MAX(game_date)         AS last_game_date,
+  ROUND(AVG(points), 2)             AS avg_points_last10,
+  ROUND(AVG(assists), 2)            AS avg_assists_last10,
+  ROUND(AVG(reboundstotal), 2)      AS avg_rebounds_last10,
+  ROUND(AVG(turnovers), 2)          AS avg_turnovers_last10,
+  ROUND(AVG(freethrowspercentage), 3) AS avg_ft_pct_last10
+FROM last10
+GROUP BY personid;
+\end{lstlisting}
+
+\subsection{Vista \texttt{player\_game\_features} — features por partido para ML}
+
+\begin{lstlisting}[style=codestyle, caption={Vista \texttt{player\_game\_features} --- stats partido x jugador con contexto de equipo y rolling features}]
+CREATE OR REPLACE VIEW `bigdata2026-485103.nba_serving.player_game_features` AS
+SELECT
+  ps.gameid, ps.game_date, ps.season,
+  ps.personid, pp.firstname, pp.lastname,
+  ps.playerteamname, ps.opponentteamname,
+  ps.home, ps.win,
+  ps.points, ps.assists, ps.reboundstotal, ps.turnovers,
+  ps.fieldgoalspercentage, ps.threepointerspercentage,
+  prf.avg_points_last10, prf.avg_assists_last10, prf.avg_rebounds_last10,
+  trf.win_rate_last10 AS team_win_rate_last10
+FROM `bigdata2026-485103.nba_curated.player_statistics` ps
+LEFT JOIN `bigdata2026-485103.nba_serving.player_profile` pp
+  ON ps.personid = pp.personid
+LEFT JOIN `bigdata2026-485103.nba_serving.player_recent_form` prf
+  ON ps.personid = prf.personid
+LEFT JOIN `bigdata2026-485103.nba_serving.team_recent_form` trf
+  ON ps.playerteamname = trf.teamname;
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- \texttt{bq ls nba\_serving} muestra 13 vistas desplegadas}]
++-----------------------------------+------+
+|              tableId              | Type |
++-----------------------------------+------+
+| player_advanced_summary           | VIEW |
+| player_conference_home_away_split | VIEW |
+| player_game_features              | VIEW |
+| player_on_off_rating_placeholder  | VIEW |
+| player_points_vs_team             | VIEW |
+| player_profile                    | VIEW |
+| player_recent_form                | VIEW |
+| team_current_overview             | VIEW |
+| team_player_leaders               | VIEW |
+| team_quarter_scoring              | VIEW |
+| team_recent_form                  | VIEW |
+| team_record_vs_top5               | VIEW |
+| team_upcoming_games               | VIEW |
++-----------------------------------+------+
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- smoke test en \texttt{player\_profile}: LeBron James con datos verificados}]
++----------+-----------+----------+---------+----------+-----------+
+| personid | firstname | lastname | country | height_m | draftyear |
++----------+-----------+----------+---------+----------+-----------+
+|     2544 | LeBron    | James    | USA     |     2.06 |      2003 |
+|  1642355 | Bronny    | James    | NULL    |     NULL |      NULL |
++----------+-----------+----------+---------+----------+-----------+
+\end{lstlisting}
+
+% ============================================================
+\section{Fase 6 — Web App: Next.js + BigQuery}
+\textit{Repositorio: \texttt{louieliet/nba-insights-web}}
+
+\subsection{Stack tecnológico}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- dependencias reales de \texttt{package.json}}]
+@google-cloud/bigquery:  ^8.1.1
+@tanstack/react-query:   ^5.90.21
+framer-motion:           ^12.34.4
+lucide-react:            ^0.576.0
+next:                    16.1.6
+react / react-dom:       19.2.3
+recharts:                ^3.7.0
+tailwind-merge:          ^3.5.0
+zod:                     ^4.3.6
+tailwindcss:             ^4
+\end{lstlisting}
+
+\subsection{Cliente BigQuery: soporte ADC + Service Account (fix producción Vercel)}
+
+El entorno de Vercel no tiene ADC, por lo que el cliente detecta si existen las env vars de la service account y construye las credenciales explícitamente.
+
+\begin{lstlisting}[style=codestyle, caption={Cliente BigQuery singleton — \texttt{src/shared/lib/bigquery/client.ts}}]
+// src/shared/lib/bigquery/client.ts
+import "server-only";
+import { BigQuery } from "@google-cloud/bigquery";
+
+const projectId = process.env.BQ_PROJECT_ID ?? "bigdata2026-485103";
+
+function buildBigQueryClient() {
+  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
+  const privateKey  = process.env.GOOGLE_PRIVATE_KEY;
+
+  if (clientEmail && privateKey) {
+    return new BigQuery({
+      projectId,
+      credentials: {
+        client_email: clientEmail,
+        private_key:  privateKey.replace(/\\n/g, "\n"), // normaliza \n escapados de Vercel
+      },
+    });
+  }
+
+  return new BigQuery({ projectId }); // fallback ADC (dev local)
+}
+
+export const bigquery = buildBigQueryClient();
+\end{lstlisting}
+
+\subsection{API Route: \texttt{/api/player-suggestions}}
+
+\begin{lstlisting}[style=codestyle, caption={API route de autocomplete --- \texttt{src/app/api/player-suggestions/route.ts}}]
+export async function GET(request: Request) {
+  const q = new URL(request.url).searchParams.get("q")?.trim() ?? "";
+  if (q.length < 2) return NextResponse.json([]);
+
+  const query = `
+    SELECT personid, firstname, lastname, country,
+      ROUND(COALESCE(heightinches, 0) * 0.0254, 2) AS height_m,
+      draftyear
+    FROM \`${projectId}.${dataset}.player_profile\`
+    WHERE LOWER(CONCAT(firstname, ' ', lastname)) LIKE LOWER(@name)
+    ORDER BY
+      CASE WHEN LOWER(firstname) = LOWER(@exact) THEN 0 ELSE 1 END,
+      lastname
+    LIMIT 8
+  `;
+
+  const [rows] = await bigquery.query({
+    query,
+    params: { name: `%${q}%`, exact: q },
+  });
+  return NextResponse.json(rows);
+}
+\end{lstlisting}
+
+\subsection{Normalización de fechas BigQuery \textrightarrow{} Recharts}
+
+BigQuery puede devolver fechas en tres formatos distintos. Se implementó \linebreak\texttt{normalizeDateValue()} server-side para garantizar que el eje X siempre recibe strings planos.
+
+\begin{lstlisting}[style=codestyle, caption={Función \texttt{normalizeDateValue} --- unifica los 3 formatos de fecha de BigQuery}]
+// Soluciona el bug de [object Object] en el eje X del chart
+function normalizeDateValue(value: unknown): string {
+  if (!value) return "";
+  if (value instanceof Date)
+    return value.toISOString().slice(0, 10);
+  if (typeof value === "string")
+    return value.includes("T") ? value.slice(0, 10) : value;
+  if (typeof value === "object") {
+    const v = (value as { value?: unknown }).value;
+    if (typeof v === "string")
+      return v.includes("T") ? v.slice(0, 10) : v;
+  }
+  return String(value).slice(0, 10);
+}
+
+// Uso al construir los datos del chart (server-side en getPlayerInsights.ts)
+recentGames.map(row => ({
+  ...row,
+  dateLabel: normalizeDateValue(row.game_date), // string para XAxis dataKey
+  game_date: normalizeDateValue(row.game_date), // fecha legible para Tooltip
+}))
+\end{lstlisting}
+
+\subsection{Fix del dropdown recortado}
+
+El contenedor de la sección hero tenía \texttt{overflow-hidden}, que recortaba el dropdown posicionado absolutamente.
+
+\begin{lstlisting}[style=codestyle, caption={Fix: cambio de \texttt{overflow-hidden} a \texttt{overflow-visible} en el hero section}]
+// ANTES - dropdown cortado por overflow
+<section className="relative py-24 overflow-hidden bg-gradient-to-b ...">
+
+// DESPUES - dropdown visible
+<section className="relative py-24 overflow-visible bg-gradient-to-b ...">
+\end{lstlisting}
+
+% ============================================================
+\section{Publicación en GitHub y Vercel}
+
+\subsection{Commits del repositorio}
+
+\begin{lstlisting}[style=codestyle, caption={Creación del repositorio privado y push a GitHub}]
+cd nba-insights-web
+
+git add .
+git commit -m "Build NBA insights frontend with BigQuery integration."
+
+# Crear repo privado en GitHub y subir
+gh repo create nba-insights-web --private --source=. --remote=origin --push
+
+# (fallback si gh no puede escribir la configuración de remote)
+git remote add origin https://github.com/louieliet/nba-insights-web.git
+git push -u origin main
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- \texttt{git log --oneline} del repositorio}]
+ceff8d8  feat: add BigQuery APIs, pages and UI widgets
+9a9c145  Add BigQuery creds, error logging, and UI fix
+756ca2d  Build NBA insights frontend with BigQuery integration.
+e0982b1  Initial commit from Create Next App
+\end{lstlisting}
+
+\begin{lstlisting}[style=outputstyle, caption={Evidencia --- archivos del commit \texttt{ceff8d8} (ultimas APIs y vistas)}]
+src/app/api/leaderboard/route.ts                    37 ++
+src/app/api/model-metrics/route.ts                  34 ++
+src/app/api/predict-win/route.ts                    72 ++++
+src/app/api/team-insights/route.ts                  29 ++
+src/entities/player/api/server/getLeaderboard.ts    82 ++++
+src/entities/player/api/server/getPlayerAdvancedInsights.ts  165 +++++++
+src/entities/player/api/server/getTeamInsights.ts  143 ++++++
+src/entities/player/api/server/getWinPrediction.ts  87 ++++
+src/entities/player/model/types.ts                 200 +++++++++
+src/shared/ui/Navbar.tsx                            53 +++
+\end{lstlisting}
+
+\subsection{Variables de entorno configuradas en Vercel}
+
+\begin{lstlisting}[style=codestyle, caption={Variables de entorno requeridas en Vercel (Settings -> Environment Variables)}]
+BQ_PROJECT_ID       = bigdata2026-485103
+BQ_SERVING_DATASET  = nba_serving
+GOOGLE_CLIENT_EMAIL = nba-enrichment-runner@bigdata2026-485103.iam.gserviceaccount.com
+GOOGLE_PRIVATE_KEY  = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+# IMPORTANTE: pegar el private key entre comillas dobles, incluyendo los \n escapados
+\end{lstlisting}
+
+% ============================================================
+\section{Resumen del flujo completo}
+
+\begin{tcolorbox}[infostyle, title={Pipeline de extremo a extremo — estado final}]
+\begin{tabular}{@{}clp{8cm}@{}}
+\toprule
+\textbf{\#} & \textbf{Fase} & \textbf{Resultado verificado} \\
+\midrule
+0.1 & GCP Setup        & Proyecto \texttt{bigdata2026-485103}, APIs habilitadas \\
+0.2 & GCS buckets      & Bucket con \texttt{datasets/}, \texttt{hive/}, \texttt{pipelines/} \\
+0.3 & Cloud SQL        & MySQL hive-metastore activo \\
+0.4 & IAM              & Service account con roles SQL + Dataproc \\
+0.5 & Dataproc         & Cluster RUNNING, n2-standard-2, imagen 2.1.108-ubuntu20 \\
+0.6 & Carga CSV        & 13 carpetas en \texttt{gs://bigdata2026-proyecto/datasets/nba/} \\
+0.7 & Hive externo     & 13 tablas en \texttt{nba\_insights}, metastore verificado \\
+0.8 & EDA PySpark      & 6 queries; 646 jugadores activos con nulos \\
+0.9 & Hive Metastore   & LOCATION de las 13 tablas confirmada vía Cloud SQL \\
+1   & step1 Spark      & 1.6M rows en \texttt{nba\_curated} (BigQuery + Hive Parquet) \\
+2   & step2 Scraping   & 3,420 registros en staging; merge a \texttt{players\_enriched} \\
+3   & phase3 Serving   & 13 vistas en \texttt{nba\_serving}, smoke tests pasados \\
+6   & Next.js App      & 4 commits, 10+ API routes, dashboard en Vercel \\
+7   & GitHub / Vercel  & \url{https://nba-insights-web-six.vercel.app} \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\end{document}

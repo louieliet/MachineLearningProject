@@ -1,0 +1,31 @@
+# ── Credentials (NEVER commit) ───────────────────────────────────────────────
+bigdata2026-485103-aead21c1d814.json
+*.service-account.json
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ── Raw data files ────────────────────────────────────────────────────────────
+originalcvs/
+*.parquet
+
+# ── Course materials and internal session notes ───────────────────────────────
+materia/
+SESION_COMPLETA_NBA_PROJECT.md
+project_info.md
+Hadoop+Cluster+Project.pdf
+Project_Info.pdf
+skills-lock.json
+
+# ── Web app (lives in its own repo) ───────────────────────────────────────────
+nba-insights-web/
+
+# ── LaTeX build artifacts ─────────────────────────────────────────────────────
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk

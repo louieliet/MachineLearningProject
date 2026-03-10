@@ -1,0 +1,10 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements_step2.txt /app/requirements_step2.txt
+RUN pip install --no-cache-dir -r /app/requirements_step2.txt
+
+COPY step2_scrape_enrich_players.py /app/step2_scrape_enrich_players.py
+
+ENTRYPOINT ["python", "-u", "/app/step2_scrape_enrich_players.py"]
